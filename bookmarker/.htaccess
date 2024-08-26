@@ -5,8 +5,9 @@
 #</IfModule>
 
 <IfModule mod_rewrite.c>
-    RewriteEngine on
-    RewriteRule    ^(\.well-known/.*)$ $1 [L]
-    RewriteRule    ^$    webroot/    [L]
-    RewriteRule    (.*) webroot/$1    [L]
+    RewriteEngine On
+    RewriteBase /path/to/app/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_URI} !^/(webroot/)?(img|css|js)/(.*)$
+    RewriteRule ^ index.php [L]
 </IfModule>

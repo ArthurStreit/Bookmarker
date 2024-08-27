@@ -12,10 +12,32 @@ namespace App\Controller;
 class BookmarksController extends AppController
 {
     /**
-     * Index method
      *
-     * @return \Cake\Http\Response|null|void Renders view
+     * @param array|null $user
+     * @return bool
      */
+    public function isAuthorized($user)
+    {
+        $action = $this->request->getParam('action');
+
+        if (in_array($action, ['index', 'add', 'tags'])) {
+            return true;
+        }
+
+        if (!$this->request->getParam('pass.0')) {
+            return false;
+        }
+
+        $id = $this->request->getParam('pass.0');
+        $bookmark = $this->Bookmarks->get($id);
+        if ($bookmark->user_id == $user['id']) {
+            return true;
+        }
+
+        return parent::isAuthorized($user);
+    }
+
+
     public function index()
     {
         $this->paginate = [
@@ -26,13 +48,6 @@ class BookmarksController extends AppController
         $this->set(compact('bookmarks'));
     }
 
-    /**
-     * View method
-     *
-     * @param string|null $id Bookmark id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function view($id = null)
     {
         $bookmark = $this->Bookmarks->get($id, [
@@ -42,11 +57,6 @@ class BookmarksController extends AppController
         $this->set(compact('bookmark'));
     }
 
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
     public function add()
     {
         $bookmark = $this->Bookmarks->newEmptyEntity();
@@ -64,13 +74,6 @@ class BookmarksController extends AppController
         $this->set(compact('bookmark', 'users', 'tags'));
     }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Bookmark id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function edit($id = null)
     {
         $bookmark = $this->Bookmarks->get($id, [
@@ -90,13 +93,6 @@ class BookmarksController extends AppController
         $this->set(compact('bookmark', 'users', 'tags'));
     }
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id Bookmark id.
-     * @return \Cake\Http\Response|null|void Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
@@ -110,12 +106,6 @@ class BookmarksController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    /**
-     * Tags method
-     *
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
     public function tags()
     {
         $tags = $this->request->getParam('pass');

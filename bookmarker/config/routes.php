@@ -12,15 +12,17 @@ return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
 
     $routes->scope('/', function (RouteBuilder $builder): void {
-        $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+        $builder->connect('/', ['controller' => 'Bookmarks', 'action' => 'index']);
+
         $builder->connect('/pages/*', 'Pages::display');
+
         $builder->fallbacks();
     });
 
     $routes->scope(
         '/bookmarks',
         ['controller' => 'Bookmarks'],
-        function ($routes) {
+        function (RouteBuilder $routes) {
             $routes->connect('/tagged/*', ['action' => 'tags']);
         }
     );

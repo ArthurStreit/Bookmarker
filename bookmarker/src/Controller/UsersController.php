@@ -12,6 +12,18 @@ namespace App\Controller;
 class UsersController extends AppController
 {
     /**
+     * Método para inicialização.
+     *
+     * @param \Cake\Event\EventInterface $event O evento de inicialização.
+     * @return void
+     */
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        $this->Auth->allow(['add']);
+    }
+
+    /**
      * Index method
      *
      * @return \Cake\Http\Response|null|void Renders view
@@ -120,6 +132,11 @@ class UsersController extends AppController
         }
     }
 
+    /**
+     * Logout method
+     *
+     * @return \Cake\Http\Response|null|void Redirects to login page.
+     */
     public function logout()
     {
         $this->Flash->success('You are now logged out.');

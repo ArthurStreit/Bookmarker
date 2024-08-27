@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use Cake\Collection\Collection;
 
 /**
  * Bookmark Entity
@@ -18,6 +19,7 @@ use Cake\ORM\Entity;
  *
  * @property \App\Model\Entity\User $user
  * @property \App\Model\Entity\Tag[] $tags
+ * @property string $tag_string
  */
 class Bookmark extends Entity
 {
@@ -39,5 +41,25 @@ class Bookmark extends Entity
         'modified' => true,
         'user' => true,
         'tags' => true,
+        'tag_string' => true,
     ];
+
+    /**
+     *
+     * @return string
+     */
+    protected function _getTagString()
+    {
+        if (isset($this->_fields['tag_string'])) {
+            return $this->_fields['tag_string'];
+        }
+        if (empty($this->tags)) {
+            return '';
+        }
+        $tags = new Collection($this->tags);
+        $str = $tags->reduce(function ($string, $tag) {
+            return $string . $tag->title . ', ';
+        }, '');
+        return trim($str, ', ');
+    }
 }

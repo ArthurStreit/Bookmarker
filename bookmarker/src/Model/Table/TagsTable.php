@@ -84,4 +84,15 @@ class TagsTable extends Table
 
         return $rules;
     }
+
+    public function findOrCreateTags(array $tags)
+    {
+        $result = [];
+        foreach ($tags as $tag) {
+            $tagEntity = $this->findOrCreate(['title' => $tag]);
+            $result[] = $tagEntity;
+        }
+        return $result;
+    }
+
 }

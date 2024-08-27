@@ -26,7 +26,11 @@
                     echo $this->Form->control('title');
                     echo $this->Form->control('description');
                     echo $this->Form->control('url');
-                    echo $this->Form->control('tags._ids', ['options' => $tags]);
+                    echo $this->Form->control('tags', [
+                        'type' => 'text',
+                        'label' => 'Tags (separated by commas)',
+                        'value' => isset($bookmark->tags) ? implode(', ', collection($bookmark->tags)->extract('title')->toList()) : ''
+                    ]);
                 ?>
             </fieldset>
             <?= $this->Form->button(__('Submit')) ?>

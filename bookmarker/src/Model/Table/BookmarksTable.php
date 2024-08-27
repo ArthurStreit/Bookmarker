@@ -100,4 +100,29 @@ class BookmarksTable extends Table
 
         return $rules;
     }
+
+    /**
+     * Custom finder to retrieve bookmarks by tags
+     *
+     * @param \Cake\ORM\Query $query The query to modify.
+     * @param array $options The options for the query.
+     * @return \Cake\ORM\Query The modified query.
+     */
+    public function findTagged(Query $query, array $options)
+    {
+        $bookmarks = $this->find()
+            ->select(['id', 'url', 'title', 'description']);
+
+        if (empty($options['tags'])) {
+            $bookmarks
+                ->leftJoinWith('Tags')
+                ->where(['Tags.title IS' => null]);
+        } else {
+            $bookmarks
+                ->innerJoinWith('Tags')
+                ->where(['Tags.title IN' => $options['tags']]);
+        }
+
+        return $bookmarks->group(['Bookmarks.id']);
+    }
 }

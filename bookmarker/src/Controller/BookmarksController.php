@@ -62,36 +62,40 @@ class BookmarksController extends AppController
         $bookmark = $this->Bookmarks->newEmptyEntity();
         if ($this->request->is('post')) {
             $bookmark = $this->Bookmarks->patchEntity($bookmark, $this->request->getData());
-            if ($this->Bookmarks->save($bookmark)) {
-                $this->Flash->success(__('The bookmark has been saved.'));
+            $bookmark->user_id = $this->Auth->user('id');
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The bookmark could not be saved. Please, try again.'));
+        if ($this->Bookmarks->save($bookmark)) {
+            $this->Flash->success('The bookmark has been saved.');
+
+            return $this->redirect(['action' => 'index']);
         }
-        $users = $this->Bookmarks->Users->find('list', ['limit' => 200])->all();
-        $tags = $this->Bookmarks->Tags->find('list', ['limit' => 200])->all();
-        $this->set(compact('bookmark', 'users', 'tags'));
+        $this->Flash->error('The bookmark could not be saved. Please, try again.');
     }
+    $tags = $this->Bookmarks->Tags->find('list')->all();
+    $this->set(compact('bookmark', 'tags'));
+    }
+
 
     public function edit($id = null)
     {
         $bookmark = $this->Bookmarks->get($id, [
-            'contain' => ['Tags'],
-        ]);
+        'contain' => ['Tags']
+    ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $bookmark = $this->Bookmarks->patchEntity($bookmark, $this->request->getData());
-            if ($this->Bookmarks->save($bookmark)) {
-                $this->Flash->success(__('The bookmark has been saved.'));
+            $bookmark->user_id = $this->Auth->user('id');
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The bookmark could not be saved. Please, try again.'));
+        if ($this->Bookmarks->save($bookmark)) {
+            $this->Flash->success('The bookmark has been saved.');
+
+            return $this->redirect(['action' => 'index']);
         }
-        $users = $this->Bookmarks->Users->find('list', ['limit' => 200])->all();
-        $tags = $this->Bookmarks->Tags->find('list', ['limit' => 200])->all();
-        $this->set(compact('bookmark', 'users', 'tags'));
+        $this->Flash->error('The bookmark could not be saved. Please, try again.');
     }
+    $tags = $this->Bookmarks->Tags->find('list')->all();
+    $this->set(compact('bookmark', 'tags'));
+}
+
 
     public function delete($id = null)
     {

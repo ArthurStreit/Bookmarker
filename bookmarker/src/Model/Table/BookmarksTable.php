@@ -125,4 +125,48 @@ class BookmarksTable extends Table
 
         return $bookmarks->group(['Bookmarks.id']);
     }
+
+    /**
+     *
+     * @param \Cake\Event\EventInterface $event The event that was fired.
+     * @param \App\Model\Entity\Bookmark $entity The entity that is going to be saved.
+     * @param \ArrayObject $options The options for the save operation.
+     * @return void
+     */
+    public function beforeSave($event, $entity, $options)
+    {
+        if ($entity->tag_string) {
+            $entity->tags = $this->_buildTags($entity->tag_string);
+        }
+    }
+
+    /**
+     *
+     * @param string $tagString
+     * @return \App\Model\Entity\Tag[]
+     */
+    protected function _buildTags($tagString)
+    {
+        $new = array_unique(array_map('trim', explode(',', $tagString)));
+        $out = [];
+        $query = $this->Tags->find()
+            ->where(['Tags.title IN' => $new]);
+
+        foreach ($query->extract('title') as $existing) {
+            $index = array_search($existing, $new);
+            if ($index !== false) {
+                unset($new[$index]);
+            }
+        }
+
+        foreach ($query as $tag) {
+            $out[] = $tag;
+        }
+
+        foreach ($new as $tag) {
+            $out[] = $this->Tags->newEntity(['title' => $tag]);
+        }
+
+        return $out;
+    }
 }
